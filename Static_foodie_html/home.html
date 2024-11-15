@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Add Chart.js -->
+    <title>Foodie Calorie Finder</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <img src="images/logo.png" class="img-responsive logo mb-5 mt-5" />
+                <form method="POST">
+                    <div class="input-group input-group-lg mb-5">
+                        <input type="text" name="query" id="searchQuery" class="form-control inputstyle"
+                            placeholder="Search for calories in your food..." required>
+                        <button class="btn whoop" type="submit" id="button-addon2">Find calories</button>
+                    </div>
+                </form>
+
+                <!-- Alert Message - Display dynamically from Flask backend -->
+                {% if alert_message %}
+                    <div class="alert alert-warning">{{ alert_message }}</div>
+                {% endif %}
+
+                <!-- Display the queried food and its calories -->
+                <h1>{{ query }} has a total of <strong>{{ nutritional_data.calories }} Calories</strong>
+                    <img src="images/shocked.png" class="img-responsive" />
+                </h1>
+
+                <!-- Display Sodium alert message -->
+                {% if nutritional_data.sodium > 100 %}
+                    <div class="alert alert-danger d-flex align-items-center mt-3" role="alert">
+                        <div>
+                            This food contains a high amount of sodium. High Sodium causes severe dehydration and water
+                            retention.
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Calorie Burn Activities Section -->
+        <div class="row justify-content-center mt-5 mb-5">
+            <div class="col-md-10 caloriescont shadow rounded">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2 class="mt-3 mb-4">Nutritional Values</h2>
+                        <ul>
+                            <li class="servingsize">Serving Size per 100g <span class="float-end"></span></li>
+                            <li>Carbohydrates: <span class="float-end">{{ nutritional_data.carbohydrates }} g</span></li>
+                            <li>Cholesterol: <span class="float-end">{{ nutritional_data.cholesterol }} mg</span></li>
+                            <li>Saturated fat: <span class="float-end">{{ nutritional_data.saturatedFat }} g</span></li>
+                            <li>Total Fat: <span class="float-end">{{ nutritional_data.totalFat }} g</span></li>
+                            <li>Fiber Content: <span class="float-end">{{ nutritional_data.fiber }} g</span></li>
+                            <li>Potassium: <span class="float-end">{{ nutritional_data.potassium }} mg</span></li>
+                            <li>Protein: <span class="float-end">{{ nutritional_data.protein }} g</span></li>
+                            <li>Sodium: <span class="float-end">{{ nutritional_data.sodium }} mg</span></li>
+                            <li>Sugar: <span class="float-end">{{ nutritional_data.sugar }} g</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-6 mb-5">
+                        <h4 class="mt-3 mb-4">To burn {{ nutritional_data.calories }} calories you will have to</h4>
+                        <!-- Loop through workout suggestions -->
+                        {% for suggestion in workout_suggestions %}
+                            <div class="d-flex align-items-center mb-5">
+                                <div class="flex-shrink-0">
+                                    <img src="{{ suggestion.image_url }}" alt="...">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>{{ suggestion.activity }}</h5>
+                                    <p>You will have to {{ suggestion.activity.lower() }} for <strong>{{ suggestion.time }}</strong> minutes</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add the Chart.js Canvas -->
+        <div class="container mt-5 mb-5">
+            <canvas id="calorieChart"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Initialize the Chart -->
+    <script>
+        var ctx = document.getElementById('calorieChart').getContext('2d');
+        var calorieChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jogging', 'Power Yoga', 'Gym Workout', 'Brisk Walk'],
+                datasets: [{
+                    label: 'Calories Burned',
+                    data: [100, 100, 100, 100], // Example data; replace with dynamic values if needed
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
